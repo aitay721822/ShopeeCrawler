@@ -55,7 +55,10 @@ def init(config):
     user_config = config.get('user')
     user_config['init'] = False
     user_config['url'] = input('請輸入欲查詢之url: ')
-
+    
+    system_config = config.get('system')
+    system_config['chrome_driver'] = input('請輸入 chrome driver 位置: ')
+    system_config['init_pages'] = int(input('請輸入一開始需要查找的頁數: '))
     save_config(config)
     return config
 

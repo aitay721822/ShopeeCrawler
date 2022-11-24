@@ -5,7 +5,6 @@ from dataclasses import dataclass
 from typing import List
 from urllib.parse import urlencode, urlparse, urlunparse, parse_qs
 from selenium import webdriver
-from selenium.webdriver.chrome.webdriver import WebDriver
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.common.by import By
@@ -21,36 +20,24 @@ class ProductItem:
     price: str
     url: str
 
-class InvalidDriverType(Exception): 
-    pass
-
 class Client:
 
-    def __init__(self, driver, logger = logging.getLogger('client')):
+    def __init__(self, driver_path, logger = logging.getLogger('client')):
         self.logger = logger
         self.regex = re.compile(r'-i\.[0-9]+\.[0-9]+')
         self.default_params = {
             'page': 0,         # page number
             'sortBy': 'ctime', # 時間排序
         }
-        if isinstance(driver, str):
-            self.driver_path = driver
-            self.driver = self.init_driver()
-        elif isinstance(driver, WebDriver):
-            self.driver = driver
-        else:
-            raise InvalidDriverType('invalid driver type')
+        self.driver_path = driver_path
+        self.driver = self.init_driver()
     
     def init_driver(self):
         options = webdriver.ChromeOptions()
         options.add_argument('--headless')
         options.add_argument('--disable-logging')
         options.add_argument('--log-level=3')
-        
-        if self.driver_path:
-            return webdriver.Chrome(self.driver_path, options=options)
-        else: 
-            return webdriver.Chrome(options=options)
+        return webdriver.Chrome(self.driver_path, options=options)
 
     def close_driver(self):
         self.driver.quit()
