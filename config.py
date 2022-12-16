@@ -16,6 +16,7 @@ default_config = {
     'user': {
         'init': True,                       # True: 需要初始化, False: 不需要初始化
         'url': 'https://shopee.tw/iPad-cat.11041546.11041612.11041613',
+        'receiver': 'name@example.com',     # 接收通知的 email
     },
     'system': {
         'state_file': 'state.txt',           # 紀錄已經通知過的商品 id

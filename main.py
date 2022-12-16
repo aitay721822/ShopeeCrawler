@@ -16,7 +16,7 @@ logger = logging.getLogger('main')
 
 # program ---
 def validate(config):
-    # 檢查欄位是否丟失
+    # 檢查欄位是否丟失 - email
     email_config = config.get('email')
     if not email_config:
         return False
@@ -26,11 +26,13 @@ def validate(config):
         'username' not in email_config or \
         'password' not in email_config:
         return False
+    # 檢查欄位是否丟失 - user
     user_config = config.get('user')
     if not user_config:
         return False
-    if 'init' not in user_config or 'url' not in user_config:
+    if 'init' not in user_config or 'url' not in user_config or 'receiver' not in user_config:
         return False
+    # 檢查欄位是否丟失 - system
     system_config = config.get('system')
     if not system_config:
         return False
@@ -43,22 +45,30 @@ def validate(config):
     return True
 
 def init(config):
+    def update_config(cfg, entry, msg, conv_method=str):
+        r = input(f'[目前值為: {cfg[entry]}] {msg}').strip()
+        if len(r) == 0:
+            return
+        cfg[entry] = conv_method(r)
+
     config = get_default_config()
     email_config = config.get('email')
     email_config['enabled'] = input('是否啟用 email 通知 (y/n): ').lower() == 'y'
     if email_config['enabled']:
-        email_config['smtp_server'] = input('請輸入 smtp 伺服器位址: ').strip()
-        email_config['smtp_port'] = int(input('請輸入 smtp 伺服器埠號: ').strip())
-        email_config['username'] = input('請輸入 smtp 使用者名稱: ').strip()
-        email_config['password'] = input('請輸入 smtp 使用者密碼: ').strip()
-    
+        update_config(email_config, 'smtp_server', '請輸入 smtp 伺服器位址: ')
+        update_config(email_config, 'smtp_port', '請輸入 smtp 伺服器埠號: ', int)
+        update_config(email_config, 'username', '請輸入 smtp 使用者名稱: ')
+        update_config(email_config, 'password', '請輸入 smtp 使用者密碼: ')
+
     user_config = config.get('user')
     user_config['init'] = False
-    user_config['url'] = input('請輸入欲查詢之url: ')
-    
+    update_config(user_config, 'url', '請輸入欲查詢之url: ')
+    update_config(user_config, 'receiver', '請輸入欲寄送通知之email: ')
+
     system_config = config.get('system')
-    system_config['chrome_driver'] = input('請輸入 chrome driver 位置: ')
-    system_config['init_pages'] = int(input('請輸入一開始需要查找的頁數: '))
+    update_config(system_config, 'chrome_driver', '請輸入 chrome driver 位置: ')
+    update_config(system_config, 'init_pages', '請輸入一開始需要查找的頁數: ', int)
+
     save_config(config)
     return config
 
@@ -106,7 +116,9 @@ def main():
     signal.signal(signal.SIGINT, signal_handler)
 
     # 抓取第一輪資料
-    url = config.get('user').get('url')
+    user_config = config.get('user')
+    url = user_config.get('url')
+    receiver = user_config.get('receiver')
     for page in range(init_pages):
         logger.info(f'Fetch page {page}')
         for item in client.fetch(url, page = page):
@@ -131,7 +143,7 @@ def main():
                 s = '<br>'.join([f"{i + 1}. {item.title}, {item.price}, {item.url}" for i, item in enumerate(newItems)])
                 send_status = False
                 while not send_status:
-                    send_status = email.send('aitay721822@gmail.com', ['aitay721822@gmail.com'], '蝦皮提醒助手', s)
+                    send_status = email.send(receiver, [receiver], '蝦皮提醒助手', s)
         except KeyboardInterrupt:
             client.close_driver()
             break
