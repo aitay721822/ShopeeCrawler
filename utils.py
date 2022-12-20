@@ -155,9 +155,9 @@ def download_chrome_driver(dst_dir, filename):
             # add extension if not exists
             if not filename.endswith('.exe'): 
                 filename += '.exe'
-            os.rename(f'{dst_dir}/chromedriver.exe', f'{dst_dir}/{filename}')
+            os.rename(os.path.join(dst_dir, 'chromedriver.exe'), os.path.join(dst_dir, filename))
         else: 
-            os.rename(f'{dst_dir}/chromedriver', f'{dst_dir}/{filename}')
+            os.rename(os.path.join(dst_dir, 'chromedriver'), os.path.join(dst_dir, filename))
         # delete the zip file.
         os.remove('chromedriver.zip')
         print('download success')
