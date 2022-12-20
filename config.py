@@ -20,7 +20,7 @@ default_config = {
     },
     'system': {
         'state_file': 'state.txt',           # 紀錄已經通知過的商品 id
-        'chrome_driver': 'chromedriver.exe', # chromedriver.exe 的路徑
+        'chrome_driver': 'chromedriver',     # chromedriver 的路徑
         'init_pages': 5,                     # 初始要查詢的頁數
     }
 }

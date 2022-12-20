@@ -8,6 +8,7 @@ from typing import List
 from client import Client, ProductItem
 from notification import GoogleEmail, DummyEmail
 from config import save_config, load_config, get_default_config
+from utils import download_chrome_driver
 
 
 # logger ---
@@ -100,6 +101,10 @@ def main():
     init_pages = system_config.get('init_pages')
 
     logger.info('Session start')
+    if not os.path.exists(chrome_driver):
+        dst = os.path.abspath(os.path.dirname(chrome_driver))
+        filename = os.path.basename(chrome_driver)
+        download_chrome_driver(dst, filename)
     client = Client(chrome_driver)
 
     logger.info('Prepare data')
