@@ -1,5 +1,6 @@
 import os
 import re
+import sys
 from sys import platform
 
 import zipfile
@@ -97,12 +98,14 @@ def download_chrome_driver(dst_dir, filename):
     current_version = detect_chrome_version()
     versions = get_all_version()
 
+    # 如果有版本直接命中，直接選擇該版本
     choose_version = None
     for version in versions:
         if version == current_version:
             choose_version = version
             break
 
+    # 如果沒有版本直接命中，則挑選與當前 major version 相同的版本
     if not choose_version:
         compatible_versions = []
         current_major_version = extract_major_version(current_version)
@@ -110,6 +113,14 @@ def download_chrome_driver(dst_dir, filename):
             if extract_major_version(version) == current_major_version:
                 compatible_versions.append(version)
         
+        # 還找不到的話就直接結束
+        if len(compatible_versions) == 0:
+            print('找不到合適的 Chrome Driver 版本')
+            print('請至 `https://chromedriver.chromium.org/downloads` 下載')
+            print('解壓縮後放置於`config.yaml`裡所設定的`chrome_driver`相同的資料夾')
+            sys.exit(1)
+
+        # 選擇版本
         while not choose_version:
             print('已為您找到合適的 Chrome Driver 版本')
             print(f'目前版本為: {current_version}')
@@ -125,7 +136,16 @@ def download_chrome_driver(dst_dir, filename):
             else:
                 print('輸入錯誤，請重新輸入')
 
+    # 列出所有可用檔案
     files = list_all_files(choose_version)
+    # 若資料夾內無檔案，則直接結束
+    if not files:
+        print('此資料夾無可用檔案')
+        print('請至 `https://chromedriver.chromium.org/downloads` 下載')
+        print('解壓縮後放置於`config.yaml`裡所設定的`chrome_driver`相同的資料夾')
+        sys.exit(1)
+        
+    # 選擇與作業系統相符之檔案
     choose_file = None
     while not choose_file:
         print('請依照作業系統選擇下列檔案之一:')
@@ -139,7 +159,7 @@ def download_chrome_driver(dst_dir, filename):
         else:
             print('輸入錯誤，請重新輸入')
 
-
+    # 下載所選擇之檔案
     download_url = f"{chromedriver_base_url}{choose_file}"
     print(f'downloading chrome driver version {choose_version} from {download_url}')
     response = requests.get(download_url, timeout=600)
@@ -161,7 +181,5 @@ def download_chrome_driver(dst_dir, filename):
         # delete the zip file.
         os.remove('chromedriver.zip')
         print('download success')
-        return True
     else:
         print('download failed')
-        return False
