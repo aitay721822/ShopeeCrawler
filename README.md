@@ -1,4 +1,4 @@
-# 蝦皮爬蟲 [selenium Ver.]
+# 蝦皮爬蟲 [selenium ver.]
 
 做個存檔紀錄寫了什麼專案，以後有用到但失效了會再更新
 
@@ -9,6 +9,7 @@
 - Python 3.5 up
 - pyyaml
 - selenium
+- requests
 
 ## Usage
 
@@ -21,3 +22,8 @@
    `python main.py` or `python3 main.py`
 
 3. 依步驟執行
+
+## Tested environment
+
+- Ubuntu 22.04 LTS
+- Windows 10 22H2
