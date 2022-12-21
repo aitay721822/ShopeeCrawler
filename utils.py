@@ -1,4 +1,5 @@
 import os
+import io
 import re
 import sys
 from sys import platform
@@ -164,11 +165,8 @@ def download_chrome_driver(dst_dir, filename):
     print(f'downloading chrome driver version {choose_version} from {download_url}')
     response = requests.get(download_url, timeout=600)
     if response.status_code == 200:
-        # Save the zip file.
-        with open('chromedriver.zip', 'wb') as f:
-            f.write(response.content)
-        # extract the zip file.
-        with zipfile.ZipFile('chromedriver.zip', 'r') as zip_ref:
+        # extract the zip file
+        with zipfile.ZipFile(io.BytesIO(response.content), 'r') as zip_ref:
             zip_ref.extractall(dst_dir)
         # rename the file 
         if platform == 'win32': 
@@ -178,8 +176,6 @@ def download_chrome_driver(dst_dir, filename):
             os.rename(os.path.join(dst_dir, 'chromedriver.exe'), os.path.join(dst_dir, filename))
         else: 
             os.rename(os.path.join(dst_dir, 'chromedriver'), os.path.join(dst_dir, filename))
-        # delete the zip file.
-        os.remove('chromedriver.zip')
         print('download success')
     else:
         print('download failed')
