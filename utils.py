@@ -120,22 +120,24 @@ def download_chrome_driver(dst_dir, filename):
             print('請至 `https://chromedriver.chromium.org/downloads` 下載')
             print('解壓縮後放置於`config.yaml`裡所設定的`chrome_driver`相同的資料夾')
             sys.exit(1)
+        elif len(compatible_versions) == 1:
+            choose_version = compatible_versions[0]
+        else:
+            # 選擇版本
+            while not choose_version:
+                print('已為您找到合適的 Chrome Driver 版本')
+                print(f'目前版本為: {current_version}')
+                print('--------------------------------')
+                print('請選擇下列版本之一:')
+                for i, version in enumerate(compatible_versions):
+                    print(f'{i}. {version}')
+                print('--------------------------------')
+                choose_index = int(input(f'請輸入編號[0 ~ {len(compatible_versions) - 1}]: ').strip())
 
-        # 選擇版本
-        while not choose_version:
-            print('已為您找到合適的 Chrome Driver 版本')
-            print(f'目前版本為: {current_version}')
-            print('--------------------------------')
-            print('請選擇下列版本之一:')
-            for i, version in enumerate(compatible_versions):
-                print(f'{i}. {version}')
-            print('--------------------------------')
-            choose_index = int(input(f'請輸入編號[0 ~ {len(compatible_versions) - 1}]: ').strip())
-
-            if 0 <= choose_index < len(compatible_versions):
-                choose_version = compatible_versions[choose_index]
-            else:
-                print('輸入錯誤，請重新輸入')
+                if 0 <= choose_index < len(compatible_versions):
+                    choose_version = compatible_versions[choose_index]
+                else:
+                    print('輸入錯誤，請重新輸入')
 
     # 列出所有可用檔案
     files = list_all_files(choose_version)
